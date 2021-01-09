@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  build-push-dockerhub-acr:
     env:
       NOME_IMAGEM: teste-site-anp
       IMAGEM_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/$NOME_IMAGEM
