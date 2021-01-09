@@ -9,7 +9,11 @@ on:
 jobs:
 
   build:
-
+    env:
+      NOME_IMAGEM: teste-site-anp
+      IMAGEM_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/$NOME_IMAGEM
+      IMAGEM_AZURECR: ${{ secrets.AZURECR_REGISTRY }}/$NOME_IMAGEM
+      
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +31,13 @@ jobs:
         registry: ${{ secrets.AZURECR_REGISTRY }}
         username: ${{ secrets.AZURECR_USERNAME }}
         password: ${{ secrets.AZURECR_PASSWORD }}
+
+    - name: Build e Push no Docker Hub + Azure Container Registry
+      run: |
+        cd ./SiteEstatico
+        docker build . --file Dockerfile --tag ${{ env.IMAGEM_DOCKERHUB }}:latest
+        docker tag ${{ env.IMAGEM_DOCKERHUB }}:latest ${{ env.IMAGEM_DOCKERHUB }}:$GITHUB_RUN_NUMBER
+        docker push ${{ env.IMAGEM_DOCKERHUB }}
+        docker tag ${{ env.IMAGEM_DOCKERHUB }}:latest ${{ env.IMAGEM_AZURECR }}:latest
+        docker tag ${{ env.IMAGEM_AZURECR }}:latest ${{ env.IMAGEM_AZURECR }}:$GITHUB_RUN_NUMBER
+        docker push ${{ env.IMAGEM_AZURECR }}
